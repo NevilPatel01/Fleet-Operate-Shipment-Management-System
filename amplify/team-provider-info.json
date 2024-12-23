@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fleetoperator-dev-5816b-authRole",
+      "UnauthRoleArn": "arn:aws:iam::977099032973:role/amplify-fleetoperator-dev-5816b-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::977099032973:role/amplify-fleetoperator-dev-5816b-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-fleetoperator-dev-5816b-deployment",
+      "UnauthRoleName": "amplify-fleetoperator-dev-5816b-unauthRole",
+      "StackName": "amplify-fleetoperator-dev-5816b",
+      "StackId": "arn:aws:cloudformation:us-east-1:977099032973:stack/amplify-fleetoperator-dev-5816b/20d30950-c15f-11ef-8824-0affe31d6205",
+      "AmplifyAppId": "d381uft2irv0mq"
+    }
+  }
+}
