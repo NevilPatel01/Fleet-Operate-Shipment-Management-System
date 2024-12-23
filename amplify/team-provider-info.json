@@ -1,0 +1,30 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-fleetoperator-dev-b36be-authRole",
+      "UnauthRoleArn": "arn:aws:iam::977099032973:role/amplify-fleetoperator-dev-b36be-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::977099032973:role/amplify-fleetoperator-dev-b36be-authRole",
+      "Region": "us-east-2",
+      "DeploymentBucketName": "amplify-fleetoperator-dev-b36be-deployment",
+      "UnauthRoleName": "amplify-fleetoperator-dev-b36be-unauthRole",
+      "StackName": "amplify-fleetoperator-dev-b36be",
+      "StackId": "arn:aws:cloudformation:us-east-2:977099032973:stack/amplify-fleetoperator-dev-b36be/3f988530-c0f7-11ef-a8de-02544d02d4ef",
+      "AmplifyAppId": "d2lssp4f0ngh5i"
+    },
+    "categories": {
+      "function": {
+        "ShipmentHandler": {},
+        "ShipmentHandle": {
+          "deploymentBucketName": "amplify-fleetoperator-dev-b36be-deployment",
+          "s3Key": "amplify-builds/ShipmentHandle-3059354a617841496b4e-build.zip"
+        }
+      },
+      "api": {
+        "allshipment": {}
+      },
+      "storage": {
+        "shipmentDB": {}
+      }
+    }
+  }
+}

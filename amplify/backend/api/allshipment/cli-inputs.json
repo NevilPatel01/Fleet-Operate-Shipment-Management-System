@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/shipment": {
+      "name": "/shipment",
+      "lambdaFunction": "ShipmentHandle",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "api": {
+    "allshipment": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "ShipmentHandle"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    }
+  },
+  "function": {
+    "ShipmentHandle": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ],
+          "category": "storage",
+          "resourceName": "shipmentDB"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_ShipmentHandle_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "ShipmentHandle"
+        }
+      ]
+    },
+    "AMPLIFY_function_ShipmentHandle_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "ShipmentHandle"
+        }
+      ]
+    }
+  },
+  "storage": {
+    "shipmentDB": {
+      "providerPlugin": "awscloudformation",
+      "service": "DynamoDB"
+    }
+  }
+}

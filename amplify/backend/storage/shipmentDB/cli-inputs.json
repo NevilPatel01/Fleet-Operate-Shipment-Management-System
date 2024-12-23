@@ -1,0 +1,16 @@
+{
+  "resourceName": "shipmentDB",
+  "tableName": "shipment",
+  "partitionKey": {
+    "fieldName": "id",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "pickupDate",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": [
+    "ShipmentHandle"
+  ]
+}
