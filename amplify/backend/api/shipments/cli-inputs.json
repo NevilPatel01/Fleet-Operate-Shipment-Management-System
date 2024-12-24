@@ -1,9 +1,9 @@
 {
   "version": 1,
   "paths": {
-    "/shipment": {
-      "name": "/shipment",
-      "lambdaFunction": "ShipmentHandle",
+    "/shipments": {
+      "name": "/shipments",
+      "lambdaFunction": "HandleShipment",
       "permissions": {
         "setting": "open"
       }

@@ -198,17 +198,25 @@ export class CreateShipmentComponent implements OnInit {
   onSubmit() {
     if (this.shipmentForm.valid) {
       const formValue = this.shipmentForm.value;
-      const shipment = new Shipment({
+      const shipment: Shipment = {
         pickup: formValue.pickup,
         delivery: formValue.delivery,
-        status: Status.Created
-      });
+        status: Status.Created,
+      };
   
-      this.shipmentService.addShipment(shipment);
-      this.snackBar.open('Shipment Created Successfully', 'Close', { duration: 3000 });
-      this.router.navigate(['/shipments']);
+      this.shipmentService.addShipment(shipment).subscribe({
+        next: () => {
+          this.snackBar.open('Shipment Created Successfully', 'Close', { duration: 3000 });
+          this.router.navigate(['/shipments']);
+        },
+        error: (err) => {
+          console.error('Failed to create shipment', err);
+          this.snackBar.open('Failed to Create Shipment', 'Close', { duration: 3000 });
+        },
+      });
     }
   }
+  
   
 
   private markFormGroupTouched(formGroup: FormGroup) {

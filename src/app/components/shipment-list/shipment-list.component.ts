@@ -5,7 +5,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { ShipmentService } from '../../services/shipment.service';
-import { Status, Address } from '../../models/shipment.model';
+import { Status, Address, Shipment } from '../../models/shipment.model';
 
 @Component({
   selector: 'app-shipment-list',
@@ -23,7 +23,7 @@ import { Status, Address } from '../../models/shipment.model';
       <button mat-raised-button color="primary" routerLink="/create">Create New Shipment</button>
     </div>
 
-    <table mat-table [dataSource]="shipmentService.sortedShipments()" class="mat-elevation-z8">
+    <table mat-table [dataSource]="shipmentService.getShipments()" class="mat-elevation-z8">
       <ng-container matColumnDef="pickupDate">
         <th mat-header-cell *matHeaderCellDef> Pickup Date </th>
         <td mat-cell *matCellDef="let shipment"> {{shipment.pickup.pickupDate | date}} </td>
@@ -47,11 +47,15 @@ import { Status, Address } from '../../models/shipment.model';
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef> Status </th>
         <td mat-cell *matCellDef="let shipment">
-          <mat-select [value]="shipment.status" (selectionChange)="updateStatus(shipment.id!, $event.value)">
-            <mat-option *ngFor="let status of statusOptions" [value]="status">
-              {{status}}
-            </mat-option>
-          </mat-select>
+        <mat-select 
+          [value]="shipment.status" 
+          (selectionChange)="updateStatus(shipment.id!, $event.value)"
+          panelWidth="fit-content">
+          <mat-option *ngFor="let status of statusOptions" [value]="status">
+            {{status}}
+          </mat-option>
+        </mat-select>
+
         </td>
       </ng-container>
 
@@ -84,11 +88,30 @@ import { Status, Address } from '../../models/shipment.model';
 export class ShipmentListComponent {
   displayedColumns = ['pickupDate', 'pickupAddress', 'deliveryDate', 'deliveryAddress', 'status'];
   statusOptions = Object.values(Status);
+  shipments: Shipment[] = [];
 
   constructor(public shipmentService: ShipmentService) {}
 
+  ngOnInit() {
+    this.loadShipments();
+  }
+
+  loadShipments() {
+    this.shipmentService.getShipments().subscribe({
+      next: (shipments) => {
+        console.log('Retrieved shipments:', shipments);
+      },
+      error: (err) => {
+        console.error('Error fetching shipments:', err.message);
+      }
+    });    
+  }
+
   updateStatus(id: string, status: Status) {
-    this.shipmentService.updateShipmentStatus(id, status);
+    this.shipmentService.updateShipmentStatus(id, status).subscribe({
+      next: () => console.log('Status updated successfully'),
+      error: (err) => console.error('Failed to update status', err),
+    });
   }
 
   formatAddress(address: Address): string {
@@ -97,7 +120,7 @@ export class ShipmentListComponent {
       address.city,
       address.state,
       address.zipcode,
-      address.country
+      address.country,
     ].filter(Boolean);
     return parts.join(', ');
   }

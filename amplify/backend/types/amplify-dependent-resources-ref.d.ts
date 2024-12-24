@@ -1,13 +1,25 @@
 export type AmplifyDependentResourcesAttributes = {
   "api": {
-    "allshipment": {
+    "Shipment": {
+      "ApiId": "string",
+      "ApiName": "string",
+      "RootUrl": "string"
+    },
+    "shipments": {
       "ApiId": "string",
       "ApiName": "string",
       "RootUrl": "string"
     }
   },
   "function": {
-    "ShipmentHandle": {
+    "HandleShipment": {
+      "Arn": "string",
+      "LambdaExecutionRole": "string",
+      "LambdaExecutionRoleArn": "string",
+      "Name": "string",
+      "Region": "string"
+    },
+    "ShipmentHandler": {
       "Arn": "string",
       "LambdaExecutionRole": "string",
       "LambdaExecutionRoleArn": "string",
@@ -16,7 +28,7 @@ export type AmplifyDependentResourcesAttributes = {
     }
   },
   "storage": {
-    "shipmentDB": {
+    "Shipment": {
       "Arn": "string",
       "Name": "string",
       "PartitionKeyName": "string",

@@ -1,6 +1,6 @@
 {
   "api": {
-    "allshipment": {
+    "Shipment": {
       "dependsOn": [
         {
           "attributes": [
@@ -8,7 +8,21 @@
             "Arn"
           ],
           "category": "function",
-          "resourceName": "ShipmentHandle"
+          "resourceName": "HandleShipment"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
+    },
+    "shipments": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "HandleShipment"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -16,17 +30,39 @@
     }
   },
   "function": {
-    "ShipmentHandle": {
+    "HandleShipment": {
       "build": true,
       "dependsOn": [
         {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
           "attributes": [
             "Name",
-            "Arn",
-            "StreamArn"
+            "Arn"
           ],
           "category": "storage",
-          "resourceName": "shipmentDB"
+          "resourceName": "Shipment"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "ShipmentHandler": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributeEnvMap": {
+            "Arn": "TABLE_ARN",
+            "Name": "TABLE_NAME"
+          },
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "category": "storage",
+          "resourceName": "Shipment"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -34,25 +70,41 @@
     }
   },
   "parameters": {
-    "AMPLIFY_function_ShipmentHandle_deploymentBucketName": {
+    "AMPLIFY_function_HandleShipment_deploymentBucketName": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "ShipmentHandle"
+          "resourceName": "HandleShipment"
         }
       ]
     },
-    "AMPLIFY_function_ShipmentHandle_s3Key": {
+    "AMPLIFY_function_HandleShipment_s3Key": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "ShipmentHandle"
+          "resourceName": "HandleShipment"
+        }
+      ]
+    },
+    "AMPLIFY_function_ShipmentHandler_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "ShipmentHandler"
+        }
+      ]
+    },
+    "AMPLIFY_function_ShipmentHandler_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "ShipmentHandler"
         }
       ]
     }
   },
   "storage": {
-    "shipmentDB": {
+    "Shipment": {
       "providerPlugin": "awscloudformation",
       "service": "DynamoDB"
     }

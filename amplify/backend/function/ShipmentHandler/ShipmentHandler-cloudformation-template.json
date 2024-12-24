@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.13.1\",\"stackType\":\"function-Lambda\",\"metadata\":{\"whyContinueWithGen1\":\"I am a current Gen 1 user\"}}",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.13.1\",\"stackType\":\"function-Lambda\",\"metadata\":{\"whyContinueWithGen1\":\"Prefer not to answer\"}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -16,17 +16,13 @@
     "s3Key": {
       "Type": "String"
     },
-    "storageshipmentDBName": {
+    "storageShipmentName": {
       "Type": "String",
-      "Default": "storageshipmentDBName"
+      "Default": "storageShipmentName"
     },
-    "storageshipmentDBArn": {
+    "storageShipmentArn": {
       "Type": "String",
-      "Default": "storageshipmentDBArn"
-    },
-    "storageshipmentDBStreamArn": {
-      "Type": "String",
-      "Default": "storageshipmentDBArn"
+      "Default": "storageShipmentArn"
     }
   },
   "Conditions": {
@@ -59,12 +55,12 @@
         "FunctionName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "ShipmentHandle",
+            "ShipmentHandler",
             {
               "Fn::Join": [
                 "",
                 [
-                  "ShipmentHandle",
+                  "ShipmentHandler",
                   "-",
                   {
                     "Ref": "env"
@@ -101,12 +97,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "fleetoperatorLambdaRolebe0efd51",
+            "fleetoperateLambdaRole137fb31a",
             {
               "Fn::Join": [
                 "",
                 [
-                  "fleetoperatorLambdaRolebe0efd51",
+                  "fleetoperateLambdaRole137fb31a",
                   "-",
                   {
                     "Ref": "env"
@@ -172,62 +168,37 @@
                   }
                 ]
               }
-            }
-          ]
-        }
-      }
-    },
-    "shipmentDBTriggerPolicy": {
-      "DependsOn": [
-        "LambdaExecutionRole"
-      ],
-      "Type": "AWS::IAM::Policy",
-      "Properties": {
-        "PolicyName": "lambda-trigger-policy-shipmentDB",
-        "Roles": [
-          {
-            "Ref": "LambdaExecutionRole"
-          }
-        ],
-        "PolicyDocument": {
-          "Version": "2012-10-17",
-          "Statement": [
+            },
             {
               "Effect": "Allow",
               "Action": [
-                "dynamodb:DescribeStream",
-                "dynamodb:GetRecords",
-                "dynamodb:GetShardIterator",
-                "dynamodb:ListStreams"
+                "dynamodb:DescribeTable",
+                "dynamodb:GetItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem"
               ],
               "Resource": [
                 {
-                  "Ref": "storageshipmentDBStreamArn"
+                  "Ref": "storageShipmentArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storageShipmentArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
                 }
               ]
             }
           ]
         }
-      }
-    },
-    "shipmentDBTrigger": {
-      "Type": "AWS::Lambda::EventSourceMapping",
-      "DependsOn": [
-        "shipmentDBTriggerPolicy"
-      ],
-      "Properties": {
-        "BatchSize": 100,
-        "Enabled": true,
-        "EventSourceArn": {
-          "Ref": "storageshipmentDBStreamArn"
-        },
-        "FunctionName": {
-          "Fn::GetAtt": [
-            "LambdaFunction",
-            "Arn"
-          ]
-        },
-        "StartingPosition": "LATEST"
       }
     }
   },
