@@ -3,13 +3,14 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Shipment, Status } from '../models/shipment.model';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { environment } from '../../environments/environments';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShipmentService {
   private shipments = signal<Shipment[]>([]);
-  private readonly apiUrl = 'https://kmzgjbpghl.execute-api.us-east-1.amazonaws.com/dev/test';
+  private apiUrl = environment.apiUrl; 
 
   readonly sortedShipments = computed(() =>
     [...this.shipments()].sort((a, b) =>
