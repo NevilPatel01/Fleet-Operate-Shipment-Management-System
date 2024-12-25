@@ -3,6 +3,7 @@ import { DynamoDBDocumentClient, PutCommand, ScanCommand, GetCommand, UpdateComm
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware';
 import bodyParser from 'body-parser';
 import express from 'express';
+import * as awsServerlessExpress from '@vendia/serverless-express';
 
 // Create DynamoDB client
 const ddbClient = new DynamoDBClient({ region: process.env.TABLE_REGION });

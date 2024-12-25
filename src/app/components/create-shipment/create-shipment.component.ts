@@ -8,7 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { Shipment, Status } from '../../models/shipment.model';
+import { Shipment, Status, Address } from '../../models/shipment.model';
 import { ShipmentService } from '../../services/shipment.service';
 
 @Component({
@@ -169,8 +169,8 @@ export class CreateShipmentComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Any additional initialization if needed
-  }
+
+    }
 
   private initForm() {
     this.shipmentForm = this.fb.group({
@@ -198,17 +198,69 @@ export class CreateShipmentComponent implements OnInit {
   onSubmit() {
     if (this.shipmentForm.valid) {
       const formValue = this.shipmentForm.value;
-      const shipment = new Shipment({
-        pickup: formValue.pickup,
-        delivery: formValue.delivery,
-        status: Status.Created
-      });
   
-      this.shipmentService.addShipment(shipment);
-      this.snackBar.open('Shipment Created Successfully', 'Close', { duration: 3000 });
-      this.router.navigate(['/shipments']);
+      // Ensure pickup and delivery data exists
+      const pickupAddress = formValue.pickup?.address || {};
+      const deliveryAddress = formValue.delivery?.address || {};
+  
+      // Prepare the shipment object for DynamoDB
+      const shipment = {
+        id: this.generateUniqueId(),
+        pickupDate: formValue.pickup?.pickupDate,
+        deliveryDate: formValue.delivery?.deliveryDate,
+        status: "created",
+        
+        // Flattening pickup address
+        pickupStreetAddress: pickupAddress.streetAddress,
+        pickupCity: pickupAddress.city,
+        pickupState: pickupAddress.state,
+        pickupZipcode: pickupAddress.zipcode,
+        pickupCountry: pickupAddress.country,
+        
+        // Flattening delivery address
+        deliveryStreetAddress: deliveryAddress.streetAddress,
+        deliveryCity: deliveryAddress.city,
+        deliveryState: deliveryAddress.state,
+        deliveryZipcode: deliveryAddress.zipcode,
+        deliveryCountry: deliveryAddress.country,
+        
+        editable: true,
+      };
+  
+      console.log('Payload:', shipment); 
+  
+      // Call the service to add the shipment
+      this.shipmentService.addShipment(shipment).subscribe({
+        next: () => {
+          this.snackBar.open('Shipment Created Successfully', 'Close', { duration: 3000 });
+          this.router.navigate(['/shipments']);
+        },
+        error: (err) => {
+          console.error('Failed to create shipment:', err);
+          this.snackBar.open('Failed to create shipment', 'Close', { duration: 3000 });
+        }
+      });
+    } else {
+      this.markFormGroupTouched(this.shipmentForm);
+      this.snackBar.open('Please fill out the form correctly', 'Close', { duration: 3000 });
     }
   }
+  
+  // Function to generate a unique ID (could be UUID or another method)
+  generateUniqueId(): string {
+    return crypto.randomUUID();
+  }
+  
+// Function to format the address into a string
+getAddressString(address: Address): string {
+  const { streetAddress, city, state, zipcode, country } = address;
+  return [streetAddress, city, state, zipcode, country]
+    .filter(part => part) // Remove undefined or empty parts
+    .join(', ');
+}
+  
+  
+
 
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {

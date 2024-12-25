@@ -28,6 +28,7 @@ export interface Address {
     pickup: Pickup;
     delivery: Delivery;
     status: Status;
+    editable?: boolean;
   
     constructor(data: Partial<Shipment> = {}) {
       this.pickup = data.pickup || { pickupDate: '', address: {} };

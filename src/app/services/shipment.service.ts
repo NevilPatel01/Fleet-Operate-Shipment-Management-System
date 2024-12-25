@@ -1,124 +1,124 @@
-// import { Injectable } from '@angular/core';
-// import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-// import { Shipment, Status } from '../models/shipment.model';
-// import { Observable, throwError } from 'rxjs';
-// import { catchError } from 'rxjs/operators';
-
-// @Injectable({
-//   providedIn: 'root',
-// })
-// export class ShipmentService {
-//   private apiUrl = 'https://<sdf>.execute-api.<1>.amazonaws.com/dev/<1>';
-
-//   constructor(private http: HttpClient) {}
-
-//   /**
-//    * Fetch all shipments from the API.
-//    */
-//   getShipments(): Observable<Shipment[]> {
-//     return this.http.get<Shipment[]>(this.apiUrl).pipe(
-//       catchError(this.handleError)
-//     );
-//   }
-
-//   /**
-//    * Add a new shipment using the API.
-//    * @param shipment - The shipment to be added.
-//    */
-//   addShipment(shipment: Shipment): Observable<Shipment> {
-//     return this.http.post<Shipment>(this.apiUrl, shipment, this.getHttpOptions()).pipe(
-//       catchError(this.handleError)
-//     );
-//   }
-
-//   /**
-//    * Update a shipment's status using the API.
-//    * @param id - Shipment ID.
-//    * @param status - New status of the shipment.
-//    */
-//   updateShipmentStatus(id: string, status: Status): Observable<void> {
-//     const url = `${this.apiUrl}/${id}`;
-//     return this.http.patch<void>(url, { status }, this.getHttpOptions()).pipe(
-//       catchError(this.handleError)
-//     );
-//   }
-
-//   /**
-//    * Common error handler.
-//    * @param error - The HTTP error response.
-//    */
-//   private handleError(error: HttpErrorResponse): Observable<never> {
-//     console.error('An error occurred:', error);
-
-//     if (error.error instanceof ErrorEvent) {
-//       // A client-side or network error occurred
-//       console.error('Client-side error:', error.error.message);
-//     } else {
-//       // The backend returned an unsuccessful response code
-//       console.error(`Backend returned code ${error.status}, body was:`, error.error);
-//     }
-
-//     return throwError(() => new Error('Something went wrong; please try again later.'));
-//   }
-
-//   /**
-//    * HTTP headers.
-//    */
-//   private getHttpOptions() {
-//     return {
-//       headers: new HttpHeaders({
-//         'Content-Type': 'application/json',
-//       }),
-//     };
-//   }
-// }
-
 import { Injectable, signal, computed } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Shipment, Status } from '../models/shipment.model';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ShipmentService {
   private shipments = signal<Shipment[]>([]);
+  private readonly apiUrl = 'https://kmzgjbpghl.execute-api.us-east-1.amazonaws.com/dev/test';
 
-  readonly sortedShipments = computed(() => 
-    [...this.shipments()].sort((a, b) => 
+  readonly sortedShipments = computed(() =>
+    [...this.shipments()].sort((a, b) =>
       new Date(a.pickup.pickupDate).getTime() - new Date(b.pickup.pickupDate).getTime()
     )
   );
 
-  constructor() {
-    this.loadShipmentsFromStorage();
+  constructor(private http: HttpClient) {
+    this.loadShipments();
   }
 
-  private loadShipmentsFromStorage() {
-    const storedShipments = localStorage.getItem('shipments');
-    if (storedShipments) {
-      this.shipments.set(JSON.parse(storedShipments));
-    }
+  private loadShipments() {
+    this.http.get<Shipment[]>(this.apiUrl)
+      .pipe(tap(shipments => this.shipments.set(shipments)))
+      .subscribe();
   }
 
-  private saveShipmentsToStorage() {
-    localStorage.setItem('shipments', JSON.stringify(this.shipments()));
-  }
-
-  addShipment(shipment: Shipment): void {
-    this.shipments.update(ships => [...ships, new Shipment(shipment)]);
-    this.saveShipmentsToStorage();
-  }
-
-  updateShipmentStatus(id: string, status: Status): void {
-    this.shipments.update(ships => 
-      ships.map(ship => 
-        ship.id === id ? { ...ship, status } : ship
-      )
+  getShipments(): Observable<any[]> {
+    return this.http.get<{ items: any[] }>(this.apiUrl).pipe(
+      map((response) => {
+        return response.items.map((item) => {
+          // Gracefully handle missing or undefined pickup and delivery addresses
+          const pickupAddress = item.pickupAddress
+            ? item.pickupAddress
+            : `${item.pickupStreetAddress || ''}, ${item.pickupCity || ''}, ${item.pickupState || ''}, ${item.pickupZipcode || ''}`;
+          
+          const deliveryAddress = item.deliveryAddress
+            ? item.deliveryAddress
+            : `${item.deliveryStreetAddress || ''}, ${item.deliveryCity || ''}, ${item.deliveryState || ''}, ${item.deliveryZipcode || ''}`;
+  
+          return {
+            id: item.id,
+            status: item.status || item.Status,
+            deliveryDate: item.deliveryDate || item.delivery,
+            pickupDate: item.pickupDate || item.pickup,
+            deliveryAddress, 
+            pickupAddress, 
+          };
+        });
+      })
     );
-    this.saveShipmentsToStorage();
   }
+  
+  
+// Add a shipment and update the signal
+addShipment(shipment: any): Observable<any> {
+  const payload = {
+    id: shipment.id,
+    pickupDate: shipment.pickupDate,
+    deliveryDate: shipment.deliveryDate,
+    status: shipment.status,
+    
+    // Flattening pickup address
+    pickupStreetAddress: shipment.pickupStreetAddress,
+    pickupCity: shipment.pickupCity,
+    pickupState: shipment.pickupState,
+    pickupZipcode: shipment.pickupZipcode,
+    pickupCountry: shipment.pickupCountry,
+    
+    // Flattening delivery address
+    deliveryStreetAddress: shipment.deliveryStreetAddress,
+    deliveryCity: shipment.deliveryCity,
+    deliveryState: shipment.deliveryState,
+    deliveryZipcode: shipment.deliveryZipcode,
+    deliveryCountry: shipment.deliveryCountry,
+    
+    editable: shipment.editable,
+  };
 
-  removeShipment(id: string): void {
-    this.shipments.update(ships => ships.filter(ship => ship.id !== id));
-    this.saveShipmentsToStorage();
+  console.log('Sending payload:', payload); // Log the data being sent
+  
+  // Ensure the endpoint URL is correct here
+  return this.http.post(this.apiUrl, payload);
+}
+
+
+  updateShipment(id: string, shipment: Shipment): Observable<Shipment> {
+    return this.http.patch<Shipment>(`${this.apiUrl}/${id}`, shipment).pipe(
+      tap(updatedShipment => {
+        this.shipments.update(shipments =>
+          shipments.map(ship => (ship.id === id ? updatedShipment : ship))
+        );
+      }),
+      catchError((error) => {
+        console.error('Error updating shipment', error);
+        return throwError(error);
+      })
+    );
+  }
+  
+
+  removeShipment(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}`, { 
+      body: { id } 
+    }).pipe(
+      tap(() => {
+        this.shipments.update(shipments =>
+          shipments.filter(shipment => shipment.id !== id)
+        );
+      }),
+      catchError((error) => {
+        console.error('Error updating shipment', error);
+        return throwError(error);
+      })
+    );
+  }  
+
+  private handleError(error: HttpErrorResponse) {
+    console.error('There was an error during the API request:', error);
+    return throwError(error);
   }
 }
