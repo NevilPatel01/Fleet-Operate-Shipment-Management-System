@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Shipment, Status } from '../models/shipment.model';
+import { Shipment, ShipmentUpdateData, Status } from '../models/shipment.model';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environments';
@@ -33,14 +33,9 @@ export class ShipmentService {
       map((response) => {
         return response.items.map((item) => {
           // Gracefully handle missing or undefined pickup and delivery addresses
-          const pickupAddress = item.pickupAddress
-            ? item.pickupAddress
-            : `${item.pickupStreetAddress || ''}, ${item.pickupCity || ''}, ${item.pickupState || ''}, ${item.pickupZipcode || ''}`;
-          
-          const deliveryAddress = item.deliveryAddress
-            ? item.deliveryAddress
-            : `${item.deliveryStreetAddress || ''}, ${item.deliveryCity || ''}, ${item.deliveryState || ''}, ${item.deliveryZipcode || ''}`;
-  
+          const pickupAddress = item.pickupAddress || 'Address unavailable'; 
+          const deliveryAddress = item.deliveryAddress || 'Address unavailable';
+
           return {
             id: item.id,
             status: item.status || item.Status,
@@ -52,55 +47,46 @@ export class ShipmentService {
         });
       })
     );
+} 
+  
+  addShipment(shipment: any): Observable<any> {
+    const payload = {
+      id: shipment.id,
+      pickupDate: shipment.pickupDate,
+      deliveryDate: shipment.deliveryDate,
+      status: shipment.status,
+      
+      // Flattening and concatenating addresses
+      pickupAddress: shipment.pickupAddress,
+      deliveryAddress: shipment.deliveryAddress,
+      
+      editable: shipment.editable,
+    };
+  
+  
+    // Ensure the endpoint URL is correct here
+    return this.http.post(this.apiUrl, payload);
   }
   
-  
-// Add a shipment and update the signal
-addShipment(shipment: any): Observable<any> {
-  const payload = {
-    id: shipment.id,
-    pickupDate: shipment.pickupDate,
-    deliveryDate: shipment.deliveryDate,
-    status: shipment.status,
-    
-    // Flattening pickup address
-    pickupStreetAddress: shipment.pickupStreetAddress,
-    pickupCity: shipment.pickupCity,
-    pickupState: shipment.pickupState,
-    pickupZipcode: shipment.pickupZipcode,
-    pickupCountry: shipment.pickupCountry,
-    
-    // Flattening delivery address
-    deliveryStreetAddress: shipment.deliveryStreetAddress,
-    deliveryCity: shipment.deliveryCity,
-    deliveryState: shipment.deliveryState,
-    deliveryZipcode: shipment.deliveryZipcode,
-    deliveryCountry: shipment.deliveryCountry,
-    
-    editable: shipment.editable,
-  };
-
-  console.log('Sending payload:', payload); // Log the data being sent
-  
-  // Ensure the endpoint URL is correct here
-  return this.http.post(this.apiUrl, payload);
-}
-
 
   updateShipment(id: string, shipment: Shipment): Observable<Shipment> {
-    return this.http.patch<Shipment>(`${this.apiUrl}/${id}`, shipment).pipe(
+    return this.http.patch<Shipment>(`${this.apiUrl}`, shipment).pipe(
       tap(updatedShipment => {
-        this.shipments.update(shipments =>
-          shipments.map(ship => (ship.id === id ? updatedShipment : ship))
-        );
+        this.shipments.update(shipments => {
+          if (Array.isArray(shipments)) {
+            return shipments.map(ship => ship.id === id ? { ...ship, ...updatedShipment } : ship);
+          } else {
+            console.error('shipments is not an array:', shipments);
+            return [];
+          }
+        });
       }),
       catchError((error) => {
-        console.error('Error updating shipment', error);
-        return throwError(error);
+        console.error('Error updating shipment:', error);
+        return throwError(() => error);
       })
     );
-  }
-  
+  }  
 
   removeShipment(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}`, { 

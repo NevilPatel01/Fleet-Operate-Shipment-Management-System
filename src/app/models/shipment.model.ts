@@ -22,6 +22,29 @@ export interface Address {
     OnTheWay = 'OnTheWay',
     Delivered = 'Delivered'
   }
+
+  export class ShipmentUpdateData {
+    id: string;
+    pickupDate?: string;
+    deliveryDate?: string;
+    status?: Status;
+    pickupAddress?: string;
+    deliveryAddress?: string;
+
+    constructor(data: Partial<Shipment> = {}) {
+      if (data.pickup) {
+        this.pickupDate = data.pickup.pickupDate;
+        this.pickupAddress = data.pickup.address?.streetAddress;
+      }
+      if (data.delivery) {
+        this.deliveryDate = data.delivery.deliveryDate;
+        this.deliveryAddress = data.delivery.address?.streetAddress;
+      }
+      this.status = data.status || Status.Created;
+      this.id = data.id || crypto.randomUUID();
+    }
+  }
+  
   
   export class Shipment {
     id?: string;

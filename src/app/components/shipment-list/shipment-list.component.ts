@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { ShipmentService } from '../../services/shipment.service';
-import { Shipment, Status } from '../../models/shipment.model';
+import { Shipment, ShipmentUpdateData, Status } from '../../models/shipment.model';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -120,25 +120,25 @@ styles: [`
 `],
 })
 export class ShipmentListComponent implements OnInit {
-shipments: any[] = [];
-displayedColumns: string[] = [
-  'id', 'pickupDate', 'pickupAddress', 'deliveryDate', 'deliveryAddress', 'status', 'actions'
-];
-statuses = ['In Transit', 'Delivered', 'Created'];
+  shipments: any[] = [];
+  displayedColumns: string[] = [
+    'id', 'pickupDate', 'pickupAddress', 'deliveryDate', 'deliveryAddress', 'status', 'actions'
+  ];
+  statuses = ['In Transit', 'Delivered', 'Created', 'OnTheWay'];
 
-constructor(private shipmentService: ShipmentService, private snackBar: MatSnackBar) {}
+  constructor(private shipmentService: ShipmentService, private snackBar: MatSnackBar) {}
 
-ngOnInit() {
-  this.shipmentService.getShipments().subscribe({
-    next: (shipments) => {
-      this.shipments = shipments;
-    },
-    error: () => {
-      this.snackBar.open('Failed to load shipments. Please try again.', 'Close', { duration: 3000 });
-    }
-  });
-}
-
+  ngOnInit() {
+    this.shipmentService.getShipments().subscribe({
+      next: (shipments) => {
+        this.shipments = shipments;
+      },
+      error: () => {
+        this.snackBar.open('Failed to load shipments. Please try again.', 'Close', { duration: 3000 });
+      }
+    });
+  }
+  
   toggleEdit(shipment: Shipment) {
     if (!shipment.id) {
       this.snackBar.open('Invalid shipment. No ID found.', 'Close', { duration: 3000 });
@@ -146,32 +146,32 @@ ngOnInit() {
     }
   
     if (shipment.editable) {
+      // Directly using the shipment object instead of the helper method
+      console.log("Shipment data to send", shipment);
       this.shipmentService.updateShipment(shipment.id, shipment).subscribe({
-        next: () => {
+        next: (updatedShipment) => {
+          Object.assign(shipment, updatedShipment);
           this.snackBar.open('Shipment updated successfully!', 'Close', { duration: 3000 });
+          shipment.editable = false;
         },
         error: () => {
           this.snackBar.open('Failed to update shipment. Please try again.', 'Close', { duration: 3000 });
         },
       });
     }
-  
     shipment.editable = !shipment.editable;
   }
   
+  
+
   removeShipment(id: string) {
     this.snackBar.open('Shipment removed successfully!', 'Close', { duration: 3000 });
     this.shipments = this.shipments.filter(shipment => shipment.id !== id);
     this.shipmentService.removeShipment(id).subscribe({
       next: () => {
-  
         // Update the local list after successful deletion
         this.shipments = this.shipments.filter(shipment => shipment.id !== id);
       },
-      
     });
   }
-  
-  
-  
 }

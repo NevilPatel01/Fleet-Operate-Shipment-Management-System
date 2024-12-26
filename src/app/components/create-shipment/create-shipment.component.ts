@@ -198,31 +198,20 @@ export class CreateShipmentComponent implements OnInit {
   onSubmit() {
     if (this.shipmentForm.valid) {
       const formValue = this.shipmentForm.value;
-  
-      // Ensure pickup and delivery data exists
-      const pickupAddress = formValue.pickup?.address || {};
-      const deliveryAddress = formValue.delivery?.address || {};
-  
-      // Prepare the shipment object for DynamoDB
+    
+      // Concatenate pickup and delivery addresses
+      const pickupAddress = this.getAddressString(formValue.pickup?.address);
+      const deliveryAddress = this.getAddressString(formValue.delivery?.address);
+    
+      // Prepare the shipment object
       const shipment = {
         id: this.generateUniqueId(),
         pickupDate: formValue.pickup?.pickupDate,
         deliveryDate: formValue.delivery?.deliveryDate,
         status: "created",
-        
-        // Flattening pickup address
-        pickupStreetAddress: pickupAddress.streetAddress,
-        pickupCity: pickupAddress.city,
-        pickupState: pickupAddress.state,
-        pickupZipcode: pickupAddress.zipcode,
-        pickupCountry: pickupAddress.country,
-        
-        // Flattening delivery address
-        deliveryStreetAddress: deliveryAddress.streetAddress,
-        deliveryCity: deliveryAddress.city,
-        deliveryState: deliveryAddress.state,
-        deliveryZipcode: deliveryAddress.zipcode,
-        deliveryCountry: deliveryAddress.country,
+  
+        pickupAddress,
+        deliveryAddress,
         
         editable: true,
       };
@@ -246,20 +235,19 @@ export class CreateShipmentComponent implements OnInit {
     }
   }
   
+  // Function to format the address into a string
+  private getAddressString(address: any): string {
+    const { streetAddress, city, state, zipcode, country } = address;
+    return [streetAddress, city, state, zipcode, country]
+      .filter(part => part) // Remove undefined or empty parts
+      .join(', ');
+  }
+  
+  
   // Function to generate a unique ID (could be UUID or another method)
   generateUniqueId(): string {
     return crypto.randomUUID();
   }
-  
-// Function to format the address into a string
-getAddressString(address: Address): string {
-  const { streetAddress, city, state, zipcode, country } = address;
-  return [streetAddress, city, state, zipcode, country]
-    .filter(part => part) // Remove undefined or empty parts
-    .join(', ');
-}
-  
-  
 
 
   private markFormGroupTouched(formGroup: FormGroup) {
