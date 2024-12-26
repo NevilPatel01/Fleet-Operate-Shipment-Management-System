@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { ShipmentService } from '../../services/shipment.service';
-import { Shipment, ShipmentUpdateData, Status } from '../../models/shipment.model';
+import { Shipment } from '../../models/shipment.model';
 import { FormsModule } from '@angular/forms';
 
 @Component({
