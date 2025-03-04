@@ -1,59 +1,103 @@
-# FleetOperate
+# 🚚 Shipment Management System
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.6.
+The **Shipment Management System** is a comprehensive platform designed to streamline and optimize trucking business operations. It provides a robust solution for managing shipments, enabling dispatchers to efficiently create, track, and update shipments. Built with modern technologies and best practices, this system ensures scalability, reliability, and maintainability.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🌟 Key Features
 
-```bash
-ng serve
-```
+- **Shipment Creation**: Dispatchers can create shipments with detailed pickup and delivery information.
+- **Shipment Tracking**: View all shipments in a table sorted by pickup date.
+- **Status Updates**: Easily update the status of shipments (e.g., Created, Dispatched, OnTheWay, Delivered).
+- **Angular Reactive Forms**: Shipment creation is implemented using Angular Reactive Forms for a seamless user experience.
+- **Angular Material UI**: A clean and intuitive user interface built with Angular Material.
+- **Unit Testing**: All logic functions are thoroughly tested with unit tests.
+- **End-to-End Testing**: Automated end-to-end tests using **Cypress** to validate user workflows.
+- **Backend Integration**: RESTful APIs hosted on AWS with API Gateway, Lambda, and DynamoDB for data storage.
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## 🛠️ Technologies Used
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Frontend
+- **Angular**: A powerful framework for building dynamic web applications.
+- **Angular Material**: UI component library for Angular.
+- **Angular Reactive Forms**: For handling complex forms and validations.
+- **Cypress**: For end-to-end testing.
 
-```bash
-ng generate component component-name
-```
+### Backend
+- **AWS API Gateway**: To host RESTful endpoints.
+- **AWS Lambda**: Serverless functions to handle API requests.
+- **DynamoDB**: NoSQL database for storing and retrieving shipment data.
+- **Node.js**: Runtime environment for backend logic.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
 
-```bash
-ng generate --help
-```
+## 📂 Project Structure
 
-## Building
+### Frontend
+- **Shipment Creation**: Implemented using Angular Reactive Forms.
+- **Shipment Table**: Displays all shipments sorted by pickup date.
+- **Status Update**: Allows dispatchers to update the status of shipments.
 
-To build the project run:
+### Backend
+- **API Gateway**: Hosts RESTful endpoints for shipment operations.
+- **Lambda Functions**: Handles CRUD operations for shipments.
+- **DynamoDB**: Stores shipment data with high scalability and performance.
 
-```bash
-ng build
-```
+---
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## 🚀 Getting Started
 
-## Running unit tests
+### Prerequisites
+- Node.js and npm installed.
+- Angular CLI installed globally.
+- AWS account for backend deployment.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Installation
 
-```bash
-ng test
-```
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/NevilPatel01/shipment-management-system.git
+   ```
 
-## Running end-to-end tests
+2. **Access Folder**
+   ```bash
+   cd shipment-management-system
+   ```
 
-For end-to-end (e2e) testing, run:
+3. Install Dependencies:
+    ```bash
+    npm install
+    ```
 
-```bash
-ng e2e
-```
+4. Run the Application:
+    ```bash
+    ng serve
+    ```
+Open your browser and navigate to `http://localhost:4200`.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+5. Run Unit Tests:
+    ```bash
+    ng test
+    ```
 
-## Additional Resources
+6. Run End-to-End Tests:
+    ```bash
+    npx cypress open
+    ```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## 🧪 Testing
+
+### Unit Tests
+- All logic functions are covered with unit tests using Jasmine and Karma.
+
+### End-to-End Tests
+- Automated tests using Cypress to simulate user interactions and validate workflows.
+
+## 🚧 Future Enhancements
+
+- Authentication: Add user authentication and authorization.
+- Notifications: Implement real-time notifications for shipment status updates.
+- Analytics Dashboard: Provide insights into shipment performance and trends.
+
